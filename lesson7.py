@@ -85,6 +85,24 @@
 
 class Cell:
     def __init__(self, count):
-        self.count = int(count)
+        self.count = int(count)* '*'
+        print(self.count)
 
-    def
+    def __add__(self, other):
+        print(f'Результат сложения двух клеток: {self.count + other.count}')
+
+    def __sub__(self, other):
+        print('Результат вычитания двух клеток: {}'.format((len(self.count) - len(other.count))* '*'))
+
+    def __mul__(self, other):
+        print('Результат умножения двух клеток: {}'.format((len(self.count) * len(other.count)) * '*'))
+
+    def __truediv__(self, other):
+        my_del = int(len(self.count) / len(other.count))
+        print('Результат деления двух клеток: {}'.format(my_del * '*'))
+
+        
+
+cell = Cell(5)
+cell_2 = Cell(3)
+print(cell / cell_2)
