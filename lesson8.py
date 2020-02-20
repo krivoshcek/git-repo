@@ -4,7 +4,6 @@
 должен извлекать число, мес€ц, год и преобразовывать их тип к типу Ђ„ислої. ¬торой, с декоратором
  @staticmethod, должен проводить валидацию числа, мес€ца и года (например, мес€ц Ч от 1 до 12). ѕроверить
  работу полученной структуры на реальных данных.
-
 """
 # import datetime
 # class Data:
@@ -85,61 +84,67 @@ class Equipment:
         print(self.item, self.count)
 
 class Printer(Equipment):
-    def __init__(self, item, count):
-        super().__init__(item, count)
-
 
     def __str__(self):
         return f'ѕринтер: {str(self.item)}, количество: {str(self.item)}'
 
 class Xerox(Equipment):
-    def __init__(self, item, count):
-        super().__init__(item, count)
-
-
+    
     def __str__(self):
         return f' серокс: {str(self.item)}, количество: {str(self.item)}'
 
 class Scaner(Equipment):
-    def to_take(self, *scaner):
-        for i in scaner:
-            
-
+    
     def __str__(self):
-        return f' серокс: {str(self.item)}, количество: {str(self.count)}, автопереворот: {str(self.hd)}'
-
-    # @property
-    def give_to_store(self):
-        return {(self.item, self.hd):self.count}
+        return f'ѕринтер: {str(self.item)}, количество: {str(self.item)}'
 
 class Store:
-    def __init__(self, printer=None, scaner=None, xerox=None):
-        self.printer = {}
-        self.scaner = {}
-        self.xerox = {}
+    def __init__(self):
+        self.printers = {}
+        self.scaners = {}
+        self.xeroxs = {}
 
 
-    def get_printer(self):
+    def get_printer(self, printer, count):
 
-        for idx, item in a.give_to_store().items():
-            for key, value in self.printer.items():
-                if key == idx:
-                    self.printer[value] += item
-                else:
-                    pass
+        if self.printers.get(printer) == None:
+            self.printers.setdefault(printer, count)
+        else:
+            _ = self.printers.pop(printer) + count
+            self.printers.setdefault(printer, _)
+        print(self.printers)
+
+    def get_scaner(self, printer, count):
+
+        if self.scaners.get(printer) == None:
+            self.scaners.setdefault(printer, count)
+        else:
+            _ = self.scaners.pop(printer) + count
+            self.scaners.setdefault(printer, _)
+        print(self.scaners)
+
+    def get_xerox(self, printer, count):
+
+        if self.xeroxs.get(printer) == None:
+            self.xeroxs.setdefault(printer, count)
+        else:
+            _ = self.xeroxs.pop(printer) + count
+            self.xeroxs.setdefault(printer, _)
+        print(self.xeroxs)
 
 
-        return self.printer
+a = Scaner('12', 'sdf')
+z = Scaner('13', 'sdf')
 
-
-a = Scaner('12', 'sdf', True)
-z = Scaner('13', 'sdf', True)
-# a.give_to_store()
-print(a.give_to_store())
-# print(type(a.give_to_store()))
 b = Store()
+z = Store()
+b.get_printer('canon', 20)
+b.get_printer('canon', 40)
+b.get_printer('nikon', 20)
+b.get_printer('nikon', 100)
+b.get_printer('canon', 20)
 
-print(b.get_printer())
+
 
 
 # b = Store
