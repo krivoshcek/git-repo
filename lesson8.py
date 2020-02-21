@@ -89,12 +89,12 @@ class Printer(Equipment):
         return f'Принтер: {str(self.item)}, количество: {str(self.item)}'
 
 class Xerox(Equipment):
-    
+
     def __str__(self):
         return f'Ксерокс: {str(self.item)}, количество: {str(self.item)}'
 
 class Scaner(Equipment):
-    
+
     def __str__(self):
         return f'Принтер: {str(self.item)}, количество: {str(self.item)}'
 
@@ -103,52 +103,65 @@ class Store:
         self.printers = {}
         self.scaners = {}
         self.xeroxs = {}
+        self.store = [self.printers, self.scaners, self.xeroxs]
 
 
     def get_printer(self, printer, count):
-
-        if self.printers.get(printer) == None:
-            self.printers.setdefault(printer, count)
-        else:
-            _ = self.printers.pop(printer) + count
-            self.printers.setdefault(printer, _)
+        try:
+            if self.printers.get(printer) == None:
+                self.printers.setdefault(printer.lower(), count)
+            else:
+                _ = self.printers.pop(printer) + count
+                self.printers.setdefault(printer, _)
+        except TypeError:
+            print('Вы ввели некорректное значение количества!')
         print(self.printers)
 
-    def get_scaner(self, printer, count):
+    def get_scaner(self, scaner, count):
+        try:
+            if self.scaners.get(scaner) == None:
+                self.scaners.setdefault(scaner.lower(), count)
+            else:
+                _ = self.scaners.pop(scaner) + count
+                self.scaners.setdefault(scaner, _)
+        except TypeError:
+            print('Вы ввели некорректное значение количества!')
 
-        if self.scaners.get(printer) == None:
-            self.scaners.setdefault(printer, count)
-        else:
-            _ = self.scaners.pop(printer) + count
-            self.scaners.setdefault(printer, _)
         print(self.scaners)
 
-    def get_xerox(self, printer, count):
+    def get_xerox(self, xerox, count):
+        try:
+            if self.xeroxs.get(xerox) == None:
+                self.xeroxs.setdefault(xerox.lower(), count)
+            else:
+                _ = self.xeroxs.pop(xerox) + count
+                self.xeroxs.setdefault(xerox, _)
+        except TypeError:
+            print('Вы ввели некорректное значение количества!')
 
-        if self.xeroxs.get(printer) == None:
-            self.xeroxs.setdefault(printer, count)
-        else:
-            _ = self.xeroxs.pop(printer) + count
-            self.xeroxs.setdefault(printer, _)
         print(self.xeroxs)
 
-
-a = Scaner('12', 'sdf')
-z = Scaner('13', 'sdf')
+    def give_office(self, item, count):
+        for i in self.store:
+            try:
+                a = i.pop(item) - count
+                if a < 0:
+                    print('На складе столько нет!')
+                    print(i)
+                    break
+                i.setdefault(item, a)
+                print(f'Вы передали в офис {item} в количестве {count} шт')
+                print(f'Остаток {item} на складе: {a} ')
+            except KeyError:
+                pass
+# Можно было сократить и все передавать на склад в одном методе get, но тогда бы все было навалено в кучу,
+# так что решил сделать так.
 
 b = Store()
-z = Store()
-b.get_printer('canon', 20)
-b.get_printer('canon', 40)
+b.get_xerox('canon', '20')
+b.get_xerox('canon', 40)
 b.get_printer('nikon', 20)
 b.get_printer('nikon', 100)
 b.get_printer('canon', 20)
-
-
-
-
-# b = Store
-# print(b.get_printer)
-
-
-
+print('=' * 20)
+b.give_office('canon', 19)
