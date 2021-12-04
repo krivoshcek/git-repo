@@ -1,0 +1,2416 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "E-commerce API\n[http://vtb.ru](http://vtb.ru)\n",
+    "version": "0.0.4",
+    "title": "1706.efcp-PayEcommerce-s-rest-v1",
+    "contact": {
+      "email": "akatev@vtb.ru",
+      "name": "Akatiev Maxim",
+      "url": "https://wiki.corp.dev.vtb/pages/viewpage.action?pageId=395602014"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://ms-ia-box-apilistener.ds1-genr01-efcp-tspdev.apps.ds1-genr01.corp.dev.vtb/openapi/smb/efcp/v1",
+      "description": "DEV"
+    },
+    {
+      "url": "https://ms-ia-box-apilistener.ss1-genr01-efcp-ift-public.apps.ss1-genr01.test.vtb.ru/openapi/smb/efcp/v1",
+      "description": "IFT"
+    },
+    {
+      "url": "https://ms-ia-box-apilistener.rs1-genr01-efcp-tsppreprod.apps.rs1-genr01.test.vtb.ru/openapi/smb/efcp/v1",
+      "description": "PREPROD"
+    },
+    {
+      "url": "https://ms-ia-box-apilistener.ps1-corb01-efcp-tspprod.apps.ps1-corb01.region.vtb.ru/openapi/smb/efcp/v1",
+      "description": "PROD"
+    }
+  ],
+  "tags": [
+    {
+      "name": "orders",
+      "description": "Операции с заказами"
+    },
+    {
+      "name": "payments",
+      "description": "Операции с платежами"
+    },
+    {
+      "name": "refunds",
+      "description": "Операции с возвратами"
+    },
+    {
+      "name": "payouts",
+      "description": "Операции с выплатами"
+    },
+    {
+      "name": "transfers",
+      "description": "Операции переводов"
+    },
+    {
+      "name": "tokens",
+      "description": "Операции с токенами"
+    },
+    {
+      "name": "key",
+      "description": "Получение публичного ключа для шифрования данных"
+    },
+    {
+      "name": "oauth",
+      "description": "Работа с токенами доступа"
+    }
+  ],
+  "security": [
+    {
+      "EpaAuth": []
+    }
+  ],
+  "paths": {
+    "/refunds": {
+      "post": {
+        "tags": [
+          "refunds"
+        ],
+        "summary": "Create refund of payment",
+        "operationId": "refund",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Refund object req",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "refundId": {
+                    "type": "string",
+                    "format": "byte",
+                    "maxLength": 64,
+                    "description": "Уникальный идентификатор возврата"
+                  },
+                  "paymentId": {
+                    "type": "string",
+                    "format": "byte",
+                    "maxLength": 64,
+                    "description": "Уникальный идентификатор платежа"
+                  },
+                  "receipt": {
+                    "description": "Обьект чека",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "customer": {
+                        "description": "Данные о клиенте",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "email": {
+                            "description": "Электронный адрес для отправки чека (в формате email)",
+                            "type": "string",
+                            "format": "byte",
+                            "maxLength": 255
+                          },
+                          "phone": {
+                            "description": "Телефонный номер",
+                            "type": "string",
+                            "format": "byte",
+                            "maxLength": 16
+                          }
+                        }
+                      },
+                      "taxSystem": {
+                        "description": "Система налогообложения",
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 64
+                      },
+                      "items": {
+                        "description": "Элементы объекта чека",
+                        "type": "array",
+                        "items": {
+                          "description": "Обьект позиции чека",
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "desciption": {
+                              "type": "string",
+                              "format": "byte",
+                              "maxLength": 64,
+                              "description": "Свойства объекта позиции чека"
+                            },
+                            "quantity": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100000000000000000000,
+                              "description": "Количество предмета расчета"
+                            },
+                            "amount": {
+                              "$ref": "#/components/schemas/amount"
+                            },
+                            "tax": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 6,
+                              "description": "Ставка НДС"
+                            },
+                            "paymentMethod": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 7,
+                              "description": "Признак способа расчета"
+                            },
+                            "paymentSubject": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 26,
+                              "description": "Признак предмета расчета"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "customFields": {
+                    "type": "string",
+                    "format": "byte",
+                    "maxLength": 255,
+                    "description": "Блок дополнительной информации (в формате json)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/refundResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Объект ответа",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/error"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Refund not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Объект ответа",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/refunds/{refundId}": {
+      "get": {
+        "tags": [
+          "refunds"
+        ],
+        "summary": "Find refund  by ID",
+        "operationId": "getRefundById",
+        "parameters": [
+          {
+            "name": "refundId",
+            "in": "path",
+            "description": "ID of refund",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "byte",
+              "maxLength": 64
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/refundResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Объект ответа",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/error"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Refund not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Объект ответа",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "refunds"
+        ],
+        "summary": "Create or update refund by ID",
+        "operationId": "updateRefundById",
+        "parameters": [
+          {
+            "name": "refundId",
+            "in": "path",
+            "description": "ID of refund",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "byte",
+              "maxLength": 64
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/refund"
+              }
+            }
+          },
+          "description": "Refund object req",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/refundResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Объект ответа",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders": {
+      "post": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Create order",
+        "operationId": "createOrder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Order object req",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "orderId": {
+                    "description": "Уникальный идентификатор заказа",
+                    "type": "string",
+                    "format": "byte",
+                    "maxLength": 64
+                  },
+                  "description": {
+                    "type": "string",
+                    "format": "byte",
+                    "maxLength": 64,
+                    "description": "Формат объекта"
+                  },
+                  "autoConfirm": {
+                    "type": "boolean",
+                    "description": "Автоматическое подтверждение заказа после оплаты (одностадийный платеж)"
+                  },
+                  "expire": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Срок жизни",
+                    "maxLength": 32
+                  },
+                  "returnPaymentData": {
+                    "description": "Вернуть данные для осуществления платежа некоторыми способами оплаты",
+                    "type": "string",
+                    "enum": [
+                      "sbp",
+                      "invoice"
+                    ]
+                  },
+                  "customer": {
+                    "description": "Данные о клиенте",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "accountId": {
+                        "description": "Уникальный идентификатор аккаунта клиента",
+                        "type": "string",
+                        "format": "byte",
+                        "maxLength": 64
+                      },
+                      "phone": {
+                        "description": "Телефонный номер клиента",
+                        "type": "string",
+                        "format": "byte",
+                        "maxLength": 20
+                      },
+                      "email": {
+                        "description": "Электронный адрес клиента (в формате email)",
+                        "type": "string",
+                        "format": "byte",
+                        "maxLength": 255
+                      },
+                      "fullName": {
+                        "description": "Полное имя клиента",
+                        "type": "string",
+                        "format": "byte",
+                        "maxLength": 255
+                      },
+                      "address": {
+                        "description": "Адрес клиента",
+                        "type": "string",
+                        "format": "byte",
+                        "maxLength": 255
+                      }
+                    }
+                  },
+                  "preselectedToken": {
+                    "description": "Обьект платежного токена",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "token"
+                    ],
+                    "properties": {
+                      "token": {
+                        "type": "string",
+                        "format": "byte",
+                        "maxLength": 255,
+                        "description": "Платежный токен"
+                      },
+                      "encryptedCvv": {
+                        "description": "Зашифрованный CVV2/CVC2",
+                        "type": "string",
+                        "format": "byte",
+                        "maxLength": 255
+                      }
+                    }
+                  },
+                  "amount": {
+                    "description": "Обьект суммы",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "value": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 10000000000,
+                        "description": "Границы значений суммы"
+                      },
+                      "currency": {
+                        "description": "Валюта",
+                        "type": "string",
+                        "enum": [
+                          "RUB",
+                          "USD",
+                          "EUR"
+                        ]
+                      }
+                    }
+                  },
+                  "totalAmount": {
+                    "description": "Обьект суммы",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "value": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 10000000000,
+                        "description": "Границы значений суммы"
+                      },
+                      "currency": {
+                        "description": "Валюта",
+                        "type": "string",
+                        "enum": [
+                          "RUB",
+                          "USD",
+                          "EUR"
+                        ]
+                      }
+                    }
+                  },
+                  "subamounts": {
+                    "description": "Обьект подсумм",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "typeId": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 10000000000,
+                          "description": "Уникальный идентификатор типа подсуммы"
+                        },
+                        "unitId": {
+                          "type": "string",
+                          "format": "byte",
+                          "maxLength": 64,
+                          "description": "Уникальный идентификатор назначения подсуммы"
+                        },
+                        "amount": {
+                          "description": "Обьект суммы",
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 10000000000,
+                              "description": "Границы значений суммы"
+                            },
+                            "currency": {
+                              "description": "Валюта",
+                              "type": "string",
+                              "enum": [
+                                "RUB",
+                                "USD",
+                                "EUR"
+                              ]
+                            }
+                          }
+                        },
+                        "comissions": {
+                          "type": "array",
+                          "description": "Информация о комиссии",
+                          "items": {
+                            "description": "Обьект комиссии",
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "targetId": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 10000000000,
+                                "description": "Уникальный идентификатор назначения комиссии"
+                              },
+                              "percent": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 100,
+                                "description": "Границы значений суммы процента от суммы комиссии"
+                              },
+                              "fixAmount": {
+                                "description": "Обьект суммы",
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "value": {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "maximum": 10000000000,
+                                    "description": "Границы значений суммы"
+                                  },
+                                  "currency": {
+                                    "description": "Валюта",
+                                    "type": "string",
+                                    "enum": [
+                                      "RUB",
+                                      "USD",
+                                      "EUR"
+                                    ]
+                                  }
+                                }
+                              },
+                              "minAmount": {
+                                "description": "Обьект суммы",
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "value": {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "maximum": 10000000000,
+                                    "description": "Границы значений суммы"
+                                  },
+                                  "currency": {
+                                    "description": "Валюта",
+                                    "type": "string",
+                                    "enum": [
+                                      "RUB",
+                                      "USD",
+                                      "EUR"
+                                    ]
+                                  }
+                                }
+                              },
+                              "maxAmount": {
+                                "description": "Обьект суммы",
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "value": {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "maximum": 10000000000,
+                                    "description": "Границы значений суммы"
+                                  },
+                                  "currency": {
+                                    "description": "Валюта",
+                                    "type": "string",
+                                    "enum": [
+                                      "RUB",
+                                      "USD",
+                                      "EUR"
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "receipt": {
+                    "description": "Обьект чека",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "customer": {
+                        "description": "Данные о клиенте",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "email": {
+                            "description": "Электронный адрес для отправки чека (в формате email)",
+                            "type": "string",
+                            "format": "byte",
+                            "maxLength": 255
+                          },
+                          "phone": {
+                            "description": "Телефонный номер",
+                            "type": "string",
+                            "format": "byte",
+                            "maxLength": 16
+                          }
+                        }
+                      },
+                      "taxSystem": {
+                        "description": "Система налогообложения",
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 64
+                      },
+                      "items": {
+                        "description": "Элементы объекта чека",
+                        "type": "array",
+                        "items": {
+                          "description": "Обьект позиции чека",
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "desciption": {
+                              "type": "string",
+                              "format": "byte",
+                              "maxLength": 64,
+                              "description": "Свойства объекта позиции чека"
+                            },
+                            "quantity": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100000000000000000000,
+                              "description": "Количество предмета расчета"
+                            },
+                            "amount": {
+                              "description": "Обьект суммы",
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "value": {
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 10000000000,
+                                  "description": "Границы значений суммы"
+                                },
+                                "currency": {
+                                  "description": "Валюта",
+                                  "type": "string",
+                                  "enum": [
+                                    "RUB",
+                                    "USD",
+                                    "EUR"
+                                  ]
+                                }
+                              }
+                            },
+                            "tax": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 6,
+                              "description": "Ставка НДС"
+                            },
+                            "paymentMethod": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 7,
+                              "description": "Признак способа расчета"
+                            },
+                            "paymentSubject": {
+                              "type": "integer",
+                              "minimum": 1,
+                              "maximum": 26,
+                              "description": "Признак предмета расчета"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "customFields": {
+                    "type": "string",
+                    "format": "byte",
+                    "maxLength": 255,
+                    "description": "Блок дополнительной информации (в формате json)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/orderResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Объект ответа",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{orderId}": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Find order by ID",
+        "description": "Find by order",
+        "operationId": "getOrderById",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "description": "ID of the order",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "byte",
+              "maxLength": 64
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/orderResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Объект ответа",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/error"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Объект ответа",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Create or update order by ID",
+        "operationId": "updateOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "description": "ID of the order that needs to be updated",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "byte",
+              "maxLength": 64
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/order"
+              }
+            }
+          },
+          "description": "Order object req",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/orderResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Объект ответа",
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "amount": {
+        "description": "Обьект суммы",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "value": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10000000000,
+            "description": "Границы значений суммы"
+          },
+          "currency": {
+            "description": "Валюта",
+            "type": "string",
+            "enum": [
+              "RUB",
+              "USD",
+              "EUR"
+            ]
+          }
+        }
+      },
+      "comission": {
+        "description": "Обьект комиссии",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "targetId": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000000000,
+            "description": "Уникальный идентификатор назначения комиссии"
+          },
+          "percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Границы значений суммы процента от суммы комиссии"
+          },
+          "fixAmount": {
+            "$ref": "#/components/schemas/amount"
+          },
+          "minAmount": {
+            "$ref": "#/components/schemas/amount"
+          },
+          "maxAmount": {
+            "$ref": "#/components/schemas/amount"
+          }
+        }
+      },
+      "subamounts": {
+        "description": "Обьект подсумм",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "typeId": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000000000,
+              "description": "Уникальный идентификатор типа подсуммы"
+            },
+            "unitId": {
+              "type": "string",
+              "format": "byte",
+              "maxLength": 64,
+              "description": "Уникальный идентификатор назначения подсуммы"
+            },
+            "amount": {
+              "$ref": "#/components/schemas/amount"
+            },
+            "comissions": {
+              "type": "array",
+              "description": "Информация о комиссии",
+              "items": {
+                "$ref": "#/components/schemas/comission"
+              }
+            }
+          }
+        }
+      },
+      "refund": {
+        "description": "Обьект возврата",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "paymentId"
+        ],
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 64,
+            "description": "Уникальный идентификатор платежа"
+          },
+          "receipt": {
+            "$ref": "#/components/schemas/receipt"
+          },
+          "customFields": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255,
+            "description": "Блок дополнительной информации (в формате json)"
+          }
+        }
+      },
+      "payout": {
+        "description": "Обьект выплаты",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "orderId": {
+            "description": "Уникальный идентификатор заказа",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 64,
+            "additionalProperties": false
+          },
+          "customer": {
+            "$ref": "#/components/schemas/customer"
+          },
+          "paymentData": {
+            "description": "Объект данных платежа",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "description": "Тип оплаты",
+                "type": "string",
+                "enum": [
+                  "card",
+                  "token",
+                  "sbp"
+                ]
+              },
+              "object": {
+                "type": "object",
+                "additionalProperties": false,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/card"
+                  },
+                  {
+                    "$ref": "#/components/schemas/token"
+                  },
+                  {
+                    "$ref": "#/components/schemas/sbp"
+                  }
+                ]
+              }
+            }
+          },
+          "customFields": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255,
+            "description": "Блок дополнительной информации (в формате json)"
+          }
+        }
+      },
+      "tokenReq": {
+        "description": "Обьект платежного токена",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "customer": {
+            "$ref": "#/components/schemas/customer"
+          },
+          "paymentData": {
+            "description": "Объект данных платежа",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "description": "Тип оплаты",
+                "type": "string",
+                "enum": [
+                  "card",
+                  "token",
+                  "sbp",
+                  "invoice"
+                ]
+              },
+              "object": {
+                "type": "object",
+                "additionalProperties": false,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/card"
+                  },
+                  {
+                    "$ref": "#/components/schemas/token"
+                  },
+                  {
+                    "$ref": "#/components/schemas/sbp"
+                  },
+                  {
+                    "$ref": "#/components/schemas/invoice"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "order": {
+        "description": "Обьект заказа",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 64,
+            "description": "Формат объекта"
+          },
+          "autoConfirm": {
+            "type": "boolean",
+            "description": "Автоматическое подтверждение заказа после оплаты (одностадийный платеж)"
+          },
+          "expire": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Срок жизни",
+            "maxLength": 32
+          },
+          "returnPaymentData": {
+            "description": "Вернуть данные для осуществления платежа некоторыми способами оплаты",
+            "type": "string",
+            "enum": [
+              "sbp",
+              "invoice"
+            ]
+          },
+          "customer": {
+            "$ref": "#/components/schemas/customer"
+          },
+          "preselectedToken": {
+            "$ref": "#/components/schemas/token"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/amount"
+          },
+          "totalAmount": {
+            "$ref": "#/components/schemas/amount"
+          },
+          "subamounts": {
+            "$ref": "#/components/schemas/subamounts"
+          },
+          "receipt": {
+            "$ref": "#/components/schemas/receipt"
+          },
+          "customFields": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255,
+            "description": "Блок дополнительной информации (в формате json)"
+          }
+        }
+      },
+      "cardTokenized": {
+        "description": "Обьект информации по карте",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "maskedPan": {
+            "description": "Зашированный номер карты",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 20
+          },
+          "expiryDate": {
+            "description": "Срок окончания действия карты",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 32
+          },
+          "cardHolder": {
+            "description": "Имя и фамилия владельца карты",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 128
+          },
+          "cardInfo": {
+            "description": "Информация о карте",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "issuerCountry": {
+                "description": "Страна банка эмитента",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 3
+              },
+              "issuerName": {
+                "description": "Наименование банка эмитента",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 255
+              }
+            }
+          }
+        }
+      },
+      "cardResponse": {
+        "description": "Обьект карты",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cardTokenized": {
+            "description": "Обьект информации по карте",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "maskedPan": {
+                "description": "Зашированный номер карты",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 20
+              },
+              "expiryDate": {
+                "description": "Срок окончания действия карты",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 32
+              },
+              "cardHolder": {
+                "description": "Имя и фамилия владельца карты",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 128
+              },
+              "cardInfo": {
+                "description": "Информация о карте",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "issuerCountry": {
+                    "description": "Страна банка эмитента",
+                    "type": "string",
+                    "format": "byte",
+                    "maxLength": 3
+                  },
+                  "issuerName": {
+                    "description": "Наименование банка эмитента",
+                    "type": "string",
+                    "format": "byte",
+                    "maxLength": 255
+                  }
+                }
+              },
+              "tokenResponse": {
+                "description": "Ответ по обьекту платежного токена",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "tokenId": {
+                    "description": "Уникальный идентификатор токена",
+                    "type": "string",
+                    "format": "byte",
+                    "maxLength": 64
+                  },
+                  "expire": {
+                    "description": "Срок жизни токена",
+                    "type": "string",
+                    "format": "date-time",
+                    "maxLength": 32
+                  },
+                  "customer": {
+                    "description": "Данные о клиенте",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "email": {
+                        "description": "Электронный адрес для отправки чека (в формате email)",
+                        "type": "string",
+                        "format": "byte",
+                        "maxLength": 255
+                      },
+                      "phone": {
+                        "description": "Телефонный номер",
+                        "type": "string",
+                        "format": "byte",
+                        "maxLength": 16
+                      }
+                    }
+                  },
+                  "paymentData": {
+                    "description": "Объект данных платежа",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "paymentMethod"
+                    ],
+                    "properties": {
+                      "paymentMethod": {
+                        "description": "Тип оплаты",
+                        "type": "string",
+                        "enum": [
+                          "card",
+                          "sbp",
+                          "invoice"
+                        ]
+                      }
+                    },
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/cardTokenized"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "card": {
+        "description": "Обьект карты",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expiryDate": {
+            "description": "Срок окончания действия карты",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 32
+          },
+          "cardHolder": {
+            "description": "Имя и фамилия владельца карты",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 64
+          },
+          "additionalData": {
+            "description": "Объект для дополнительных данных",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "description": "Тип оплаты",
+                "type": "string",
+                "enum": [
+                  "applepay",
+                  "googlepay",
+                  "samsungpay",
+                  "threeds"
+                ]
+              },
+              "object": {
+                "type": "object",
+                "additionalProperties": false,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/applepay"
+                  },
+                  {
+                    "$ref": "#/components/schemas/googlepay"
+                  },
+                  {
+                    "$ref": "#/components/schemas/samsungpay"
+                  },
+                  {
+                    "$ref": "#/components/schemas/threeds"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "applepay": {
+        "description": "Обьект Apple Pay",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "eci": {
+            "description": "E-commerce indicator",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 2
+          },
+          "cavv": {
+            "description": "Уникальное значение дополнительной верификации (CAVV/AAV)",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255
+          }
+        }
+      },
+      "googlepay": {
+        "description": "Обьект Google Pay",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "eci": {
+            "description": "E-commerce indicator",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 2
+          },
+          "cavv": {
+            "description": "Уникальное значение дополнительной верификации (CAVV/AAV)",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255
+          }
+        }
+      },
+      "samsungpay": {
+        "description": "Обьект Samsung Pay",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "eci": {
+            "description": "E-commerce indicator",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 2
+          },
+          "cavv": {
+            "description": "Уникальное значение дополнительной верификации (CAVV/AAV)",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255
+          }
+        }
+      },
+      "threeds": {
+        "description": "Обьект данных 3DS",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "xid": {
+            "description": "Уникальный номер транзакции дополнительной верификации",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 64
+          },
+          "cavv": {
+            "description": "Уникальное значение дополнительной верификации (CAVV/AAV)",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255
+          },
+          "eci": {
+            "description": "E-commerce indicator",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 16
+          }
+        }
+      },
+      "token": {
+        "description": "Обьект платежного токена",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255,
+            "description": "Платежный токен"
+          },
+          "encryptedCvv": {
+            "description": "Зашифрованный CVV2/CVC2",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255
+          }
+        }
+      },
+      "sbp": {
+        "description": "Обьект СБП",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "phone": {
+            "description": "Телефонный номер",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 16
+          }
+        }
+      },
+      "invoice": {
+        "description": "Обьект инвойса",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "phone": {
+            "description": "Телефонный номер",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 16
+          }
+        }
+      },
+      "sbpResponse": {
+        "description": "Обьект для оплаты по СБП",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "description": "Ссылка для оплаты",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255
+          }
+        }
+      },
+      "invoiceResponse": {
+        "description": "Обьект для оплаты по инвойсингу",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "description": "Ссылка для оплаты",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255
+          }
+        }
+      },
+      "receipt": {
+        "description": "Обьект чека",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "customer": {
+            "description": "Данные о клиенте",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "email": {
+                "description": "Электронный адрес для отправки чека (в формате email)",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 255
+              },
+              "phone": {
+                "description": "Телефонный номер",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 16
+              }
+            }
+          },
+          "taxSystem": {
+            "description": "Система налогообложения",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 64
+          },
+          "items": {
+            "description": "Элементы объекта чека",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/receiptItem"
+            }
+          }
+        }
+      },
+      "receiptItem": {
+        "description": "Обьект позиции чека",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "desciption": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 64,
+            "description": "Свойства объекта позиции чека"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000000000000000000,
+            "description": "Количество предмета расчета"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/amount"
+          },
+          "tax": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 6,
+            "description": "Ставка НДС"
+          },
+          "paymentMethod": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 7,
+            "description": "Признак способа расчета"
+          },
+          "paymentSubject": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 26,
+            "description": "Признак предмета расчета"
+          }
+        }
+      },
+      "payment": {
+        "description": "Обьект платежа",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "orderId": {
+            "description": "Уникальный идентификатор заказа",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 64
+          },
+          "description": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 64,
+            "description": "Описание заказа"
+          },
+          "autoConfirm": {
+            "type": "boolean",
+            "description": "Автоматическое подтверждение заказа после оплаты (одностадийный платеж)"
+          },
+          "returnUrl": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255,
+            "description": "URL фронт системы Предприятия для возврата Плательщика после верификации 3DS"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/customer"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/amount"
+          },
+          "subamounts": {
+            "$ref": "#/components/schemas/subamounts"
+          },
+          "paymentData": {
+            "description": "Объект данных платежа",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "description": "Тип оплаты",
+                "type": "string",
+                "enum": [
+                  "card",
+                  "token"
+                ]
+              },
+              "object": {
+                "type": "object",
+                "additionalProperties": false,
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/card"
+                  },
+                  {
+                    "$ref": "#/components/schemas/token"
+                  }
+                ]
+              }
+            }
+          },
+          "receipt": {
+            "$ref": "#/components/schemas/receipt"
+          },
+          "customFields": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255,
+            "description": "Блок дополнительной информации (в формате json)"
+          }
+        }
+      },
+      "transfer": {
+        "description": "Обьект перевода",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "orderId": {
+            "description": "Уникальный идентификатор заказа",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 64
+          },
+          "description": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255,
+            "description": "Свойства объекта перевода"
+          },
+          "returnUrl": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255,
+            "description": "URL фронт системы Предприятия для возврата Плательщика после верификации 3DS"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/amount"
+          },
+          "source": {
+            "description": "Объект инициатора перевода",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "customer": {
+                "$ref": "#/components/schemas/customer"
+              },
+              "paymentData": {
+                "description": "Объект данных платежа",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "description": "Тип оплаты",
+                    "type": "string",
+                    "enum": [
+                      "card",
+                      "token"
+                    ]
+                  },
+                  "object": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/card"
+                      },
+                      {
+                        "$ref": "#/components/schemas/token"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "destination": {
+            "description": "Объект получателя перевода",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "customer": {
+                "$ref": "#/components/schemas/customer"
+              },
+              "paymentData": {
+                "description": "Объект данных платежа",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "description": "Тип оплаты",
+                    "type": "string",
+                    "enum": [
+                      "card",
+                      "token",
+                      "sbp"
+                    ]
+                  },
+                  "object": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/card"
+                      },
+                      {
+                        "$ref": "#/components/schemas/token"
+                      },
+                      {
+                        "$ref": "#/components/schemas/sbp"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "customFields": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255,
+            "description": "Блок дополнительной информации (в формате json)"
+          }
+        }
+      },
+      "status": {
+        "description": "Обьект статуса",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "changedAt": {
+            "description": "Время изменения статуса",
+            "type": "string",
+            "format": "date-time",
+            "maxLength": 32
+          },
+          "value": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255,
+            "description": "Код статуса"
+          },
+          "description": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255,
+            "description": "Описание кода статуса"
+          }
+        }
+      },
+      "error": {
+        "description": "Обьект ошибки",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "description": "Код ошибки"
+          },
+          "description": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255,
+            "description": "Описание кода ошибки"
+          },
+          "traceId": {
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255,
+            "description": "Уникальный id запроса для обращения в техподдержку"
+          },
+          "details": {
+            "type": "array",
+            "description": "Массив объектов с детальным описанием ошибок",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Дополнительная информация",
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "format": "byte",
+                  "maxLength": 255,
+                  "description": "Ошибка"
+                },
+                "description": {
+                  "type": "string",
+                  "format": "byte",
+                  "maxLength": 255,
+                  "description": "Описание ошибки"
+                }
+              }
+            }
+          }
+        }
+      },
+      "orderResponse": {
+        "description": "Обьект заказа",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Тип объекта (ORDER)",
+            "enum": [
+              "ORDER"
+            ]
+          },
+          "object": {
+            "description": "Обьект заказа",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "orderId": {
+                "description": "Уникальный идентификатор заказа",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 64
+              },
+              "createdAt": {
+                "description": "Время создания",
+                "type": "string",
+                "format": "date-time",
+                "maxLength": 32
+              },
+              "expire": {
+                "description": "Срок жизни заказа",
+                "type": "string",
+                "format": "date-time",
+                "maxLength": 32
+              },
+              "payUrl": {
+                "description": "Адрес платежной формы для редиректа клиента на оплату (в формате fqdn)",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 255
+              },
+              "preparedPayments": {
+                "type": "array",
+                "description": "Данные для осуществления оплаты",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "type": {
+                      "description": "Тип оплаты",
+                      "type": "string",
+                      "enum": [
+                        "sbp",
+                        "invoice"
+                      ]
+                    },
+                    "object": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/sbpResponse"
+                        },
+                        {
+                          "$ref": "#/components/schemas/invoiceResponse"
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "amount": {
+                "$ref": "#/components/schemas/amount"
+              },
+              "totalAmount": {
+                "$ref": "#/components/schemas/amount"
+              },
+              "subamounts": {
+                "$ref": "#/components/schemas/subamounts"
+              },
+              "paidAmount": {
+                "$ref": "#/components/schemas/amount"
+              },
+              "status": {
+                "$ref": "#/components/schemas/status"
+              },
+              "contents": {
+                "type": "array",
+                "description": "Блок информации по операциям в рамках заказа",
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/paymentResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/refundResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/payoutResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/transferResponse"
+                    }
+                  ]
+                }
+              },
+              "customFields": {
+                "type": "string",
+                "format": "byte",
+                "maxLength": 255,
+                "description": "Блок дополнительной информации (в формате json)"
+              }
+            }
+          },
+          "error": {
+            "$ref": "#/components/schemas/error"
+          }
+        }
+      },
+      "paymentResponse": {
+        "description": "Обьект платежа",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Тип объекта (PAYMENT)",
+            "enum": [
+              "PAYMENT"
+            ]
+          },
+          "object": {
+            "description": "Обьект платежа",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "paymentId": {
+                "description": "Уникальный идентификатор платежа",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 64
+              },
+              "txnId": {
+                "description": "Уникальный идентификатор транзацкии",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 64
+              },
+              "orderId": {
+                "description": "Уникальный идентификатор заказа",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 64
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "maxLength": 32,
+                "description": "Время создания заказа"
+              },
+              "description": {
+                "type": "string",
+                "format": "byte",
+                "maxLength": 255,
+                "description": "Дополнительная информация"
+              },
+              "amount": {
+                "$ref": "#/components/schemas/amount"
+              },
+              "subamounts": {
+                "$ref": "#/components/schemas/subamounts"
+              },
+              "paymentData": {
+                "description": "Объект данных платежа",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "description": "Тип оплаты",
+                    "type": "string",
+                    "enum": [
+                      "card",
+                      "token",
+                      "sbp",
+                      "invoice"
+                    ]
+                  },
+                  "object": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/cardResponse"
+                      },
+                      {
+                        "$ref": "#/components/schemas/tokenResponse"
+                      }
+                    ]
+                  }
+                }
+              },
+              "customFields": {
+                "type": "string",
+                "format": "byte",
+                "maxLength": 255,
+                "description": "Дополнительная информация (в формате json)"
+              },
+              "status": {
+                "$ref": "#/components/schemas/status"
+              },
+              "additionalAction": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Необходимые дополнительные действвия",
+                "properties": {
+                  "action": {
+                    "description": "Тип действия",
+                    "type": "string",
+                    "enum": [
+                      "redirect"
+                    ]
+                  },
+                  "value": {
+                    "description": "Значение параметра для действия",
+                    "type": "string",
+                    "format": "byte",
+                    "maxLength": 255
+                  }
+                }
+              }
+            }
+          },
+          "error": {
+            "$ref": "#/components/schemas/error"
+          }
+        }
+      },
+      "refundResponse": {
+        "description": "Обьект результата возврата платежа",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Тип объекта (REFUND)",
+            "enum": [
+              "REFUND"
+            ]
+          },
+          "object": {
+            "description": "Обьект возврата платежа",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "refundId": {
+                "description": "Уникальный идентификатор возрата платежа",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 64
+              },
+              "paymentId": {
+                "description": "Уникальный идентификатор платежа",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 64
+              },
+              "txnId": {
+                "description": "Уникальный идентификатор транзацкии",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 64
+              },
+              "orderId": {
+                "description": "Уникальный идентификатор заказа",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 64
+              },
+              "createdAt": {
+                "description": "Время создания возврата платежа",
+                "type": "string",
+                "format": "date-time",
+                "maxLength": 32
+              },
+              "status": {
+                "$ref": "#/components/schemas/status"
+              }
+            }
+          },
+          "error": {
+            "$ref": "#/components/schemas/error"
+          }
+        }
+      },
+      "payoutResponse": {
+        "description": "Объект выплаты",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Тип объекта (PAYOUT)",
+            "enum": [
+              "PAYOUT"
+            ]
+          },
+          "object": {
+            "description": "Объект выплаты",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "payoutId": {
+                "description": "Уникальный идентификатор выплаты",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 64
+              },
+              "txnId": {
+                "description": "Уникальный идентификатор транзацкии",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 64
+              },
+              "orderId": {
+                "description": "Уникальный идентификатор заказа",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 64
+              },
+              "createdAt": {
+                "description": "Время создания выплаты",
+                "type": "string",
+                "format": "date-time",
+                "maxLength": 32
+              },
+              "status": {
+                "$ref": "#/components/schemas/status"
+              }
+            }
+          },
+          "error": {
+            "$ref": "#/components/schemas/error"
+          }
+        }
+      },
+      "transferResponse": {
+        "description": "Объект перевода",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Тип объекта (TRANSFER)",
+            "enum": [
+              "TRANSFER"
+            ]
+          },
+          "object": {
+            "description": "Объект перевода",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "transfertId": {
+                "description": "Уникальный идентификатор перевода",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 64
+              },
+              "orderId": {
+                "description": "Уникальный идентификатор заказа",
+                "type": "string",
+                "format": "byte",
+                "maxLength": 64
+              },
+              "createdAt": {
+                "description": "Время создания перевода",
+                "type": "string",
+                "format": "date-time",
+                "maxLength": 32
+              },
+              "status": {
+                "$ref": "#/components/schemas/status"
+              },
+              "additionalAction": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Необходимые дополнительные действвия",
+                "properties": {
+                  "action": {
+                    "description": "Тип действия",
+                    "type": "string",
+                    "enum": [
+                      "redirect"
+                    ]
+                  },
+                  "value": {
+                    "description": "Значение параметра для действия",
+                    "type": "string",
+                    "format": "byte",
+                    "maxLength": 255
+                  }
+                }
+              }
+            }
+          },
+          "error": {
+            "$ref": "#/components/schemas/error"
+          }
+        }
+      },
+      "tokenResponse": {
+        "description": "Обьект платежного токена",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tokenId": {
+            "description": "Уникальный идентификатор токена",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 64
+          },
+          "expire": {
+            "description": "Срок жизни токена",
+            "type": "string",
+            "format": "date-time",
+            "maxLength": 32
+          },
+          "customer": {
+            "$ref": "#/components/schemas/customer"
+          },
+          "paymentData": {
+            "description": "Объект данных платежа",
+            "type": "object",
+            "additionalProperties": false,
+            "discriminator": {
+              "propertyName": "paymentMethod",
+              "mapping": {
+                "card": "#/components/schemas/cardTokenized"
+              }
+            },
+            "required": [
+              "paymentMethod"
+            ],
+            "properties": {
+              "paymentMethod": {
+                "type": "string",
+                "description": "Тип оплаты",
+                "enum": [
+                  "card",
+                  "sbp",
+                  "invoice"
+                ]
+              }
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/cardTokenized"
+              }
+            ]
+          }
+        }
+      },
+      "tokensResponse": {
+        "description": "Обьект токена карты",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/tokenResponse"
+        }
+      },
+      "customer": {
+        "description": "Данные о клиенте",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accountId": {
+            "description": "Уникальный идентификатор аккаунта клиента",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 64
+          },
+          "phone": {
+            "description": "Телефонный номер клиента",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 20
+          },
+          "email": {
+            "description": "Электронный адрес клиента (в формате email)",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255
+          },
+          "fullName": {
+            "description": "Полное имя клиента",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255
+          },
+          "address": {
+            "description": "Адрес клиента",
+            "type": "string",
+            "format": "byte",
+            "maxLength": 255
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "EpaAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
